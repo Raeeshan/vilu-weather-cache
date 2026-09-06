@@ -1,0 +1,61 @@
+name: Weather cache refresh
+
+on:
+  schedule:
+    - cron: '*/20 * * * *' # every 20 minutes -- inside WeatherAPI's 60-min current-conditions cache limit
+  workflow_dispatch: {} # manual "Run workflow" button, for testing without waiting for the schedule
+
+permissions:
+  contents: write # least privilege: only permission needed is to commit weather-cache.json to this repo
+
+concurrency:
+  group: weather-cache-refresh
+  cancel-in-progress: false # let an in-flight run finish rather than racing two writes
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch WeatherAPI.com free-tier data for Maamigili
+        env:
+          WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
+        run: node scripts/fetch-weather.js
+        # WEATHERAPI_KEY is only ever read via process.env inside the script
+        # (see scripts/fetch-weather.js) -- never referenced in this file's
+        # own shell steps, never echoed, never part of a constructed command
+        # string. If fetch-weather.js fails (bad response, wrong location,
+        # incomplete fields), it exits non-zero and this step fails the run
+        # visibly in the Actions tab -- the commit step below never runs,
+        # so the last valid weather-cache.json is left untouched.
+
+      - name: Verify no secret leaked into the working tree
+        env:
+          WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
+        run: |
+          if [ -n "$WEATHERAPI_KEY" ] && grep -R --exclude-dir=.git -l -- "$WEATHERAPI_KEY" . ; then
+            echo "::error::WEATHERAPI_KEY value found in the working tree -- refusing to commit."
+            exit 1
+          fi
+          if grep -R --exclude-dir=.git -l "api.weatherapi.com" weather-cache.json 2>/dev/null; then
+            echo "::error::provider URL found inside weather-cache.json -- refusing to commit."
+            exit 1
+          fi
+          echo "Secret-exposure check passed."
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "vilu-weather-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet -- weather-cache.json; then
+            echo "No change in weather-cache.json -- skipping commit."
+            exit 0
+          fi
+          git add weather-cache.json
+          git commit -m "chore(weather): refresh cache $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push origin HEAD:main
