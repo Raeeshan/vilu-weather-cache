@@ -61,6 +61,12 @@ production frontend has its own ~90-minute staleness check and shows an
 honest "Live conditions temporarily unavailable" message rather than
 serving very old data as if it were current.
 
+## Tests
+
+`node test/fetch-weather.test.js` — static/unit checks (no network, no
+key needed): time-format conversion, key non-exposure, the pre-write
+self-check, and the Maldives location-verification requirement.
+
 ## Manual run
 
 Actions tab → "Weather cache refresh" → "Run workflow" — useful for
