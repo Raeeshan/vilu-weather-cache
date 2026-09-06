@@ -52,10 +52,17 @@ jobs:
         run: |
           git config user.name "vilu-weather-bot"
           git config user.email "actions@users.noreply.github.com"
-          if git diff --quiet -- weather-cache.json; then
+          # `git diff --quiet` only compares TRACKED files against the index --
+          # it silently reports "no difference" for a brand-new, untracked
+          # weather-cache.json (the very first run), which skipped the commit
+          # entirely on this repo's first real fetch. `git add` first, then
+          # diff the INDEX against HEAD, so a new file is correctly seen as
+          # a change (git diff --cached is empty only when the file's
+          # content is byte-identical to what's already committed).
+          git add weather-cache.json
+          if git diff --cached --quiet; then
             echo "No change in weather-cache.json -- skipping commit."
             exit 0
           fi
-          git add weather-cache.json
           git commit -m "chore(weather): refresh cache $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git push origin HEAD:main
