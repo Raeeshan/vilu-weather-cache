@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-10-15T06:24:09.757Z",
+  "updated_at": "2026-10-15T12:04:24.226Z",
   "location": "Mahibadhoo, Maale, Maldives",
-  "temperature_c": 28.5,
+  "temperature_c": 28.1,
   "condition": {
-    "code": 1000,
-    "text": "Sunny"
+    "code": 1240,
+    "text": "Light rain shower"
   },
   "is_day": 1,
   "sunrise": "05:52",
@@ -12,7 +12,7 @@
   "forecast": [
     {
       "date": "2026-10-15",
-      "max_c": 28.6,
+      "max_c": 28.5,
       "min_c": 27.7,
       "condition": {
         "code": 1240,
@@ -22,7 +22,7 @@
     {
       "date": "2026-10-16",
       "max_c": 28.5,
-      "min_c": 27.1,
+      "min_c": 27.3,
       "condition": {
         "code": 1240,
         "text": "Light rain shower"
@@ -30,8 +30,8 @@
     },
     {
       "date": "2026-10-17",
-      "max_c": 27.7,
-      "min_c": 25.2,
+      "max_c": 27.9,
+      "min_c": 27,
       "condition": {
         "code": 1240,
         "text": "Light rain shower"
