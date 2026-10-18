@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-10-18T20:10:00.333Z",
+  "updated_at": "2026-10-18T22:28:18.177Z",
   "location": "Mahibadhoo, Maale, Maldives",
   "temperature_c": 28.5,
   "condition": {
-    "code": 1006,
-    "text": "Cloudy"
+    "code": 1063,
+    "text": "Patchy rain nearby"
   },
   "is_day": 0,
   "sunrise": "05:52",
